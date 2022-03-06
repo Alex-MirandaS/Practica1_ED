@@ -5,9 +5,14 @@
 package Principal;
 
 import Archivos.LectorArchivosEnTexto;
-import GUI.VentajaPrincipal;
+import GUI.EditorResultados;
+import GUI.TablaResultados;
+import GUI.VentanaPrincipal;
 import Listas.Lista;
 import Objetos.Ficha;
+import Objetos.Resultado;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
 
 /**
  *
@@ -15,14 +20,24 @@ import Objetos.Ficha;
  */
 public class Principal {
 
-    private VentajaPrincipal ventajaPrincipal = new VentajaPrincipal(this);
+    private VentanaPrincipal ventanaPrincipal = new VentanaPrincipal(this);
+    private EditorResultados editorResultados = new EditorResultados(this);
+    private TablaResultados tablaResultados = new TablaResultados();
 
     private LectorArchivosEnTexto lector = new LectorArchivosEnTexto();
     private Controlador controlador = new Controlador(this);
     private Lista<Ficha> apuestas = new Lista<>();
+    private Lista<Ficha> errores = new Lista<>();
+    private Lista<Resultado> resultados = new Lista<>();
+
+    public void iniciar() {
+        ventanaPrincipal.setVisible(true);
+    }
 
     public void ingresarApuestas() {
-        Lista<Ficha> apuestas = controlador.obtenerDatosTexto();
+        editorResultados = new EditorResultados(this);
+        apuestas = controlador.obtenerDatosTexto();
+        ventanaPrincipal.getAreaTexto().setText("Apuestas Cargadas Correctamente");
     }
 
     public void verificarApuestas() {
@@ -30,42 +45,70 @@ public class Principal {
         for (int i = 0; i < apuestas.getSize(); i++) {
             String[] datos = apuestas.get(i).getDatos().split(",");
 
-            if (datos.length != Constantes.CANTIDAD_DATOS) {
+            if (datos.length == Constantes.CANTIDAD_DATOS) {
                 try {
                     apuestas.get(i).setApostador(datos[0]);
                     apuestas.get(i).setMonto(Double.parseDouble(datos[1]));
-                    int[] numeros = {Integer.parseInt(datos[2]),
-                        Integer.parseInt(datos[3]),
-                        Integer.parseInt(datos[4]),
-                        Integer.parseInt(datos[5]),
-                        Integer.parseInt(datos[6]),
-                        Integer.parseInt(datos[7]),
-                        Integer.parseInt(datos[8]),
-                        Integer.parseInt(datos[9]),
-                        Integer.parseInt(datos[10]),
-                        Integer.parseInt(datos[11])};
-                    if (controlador.esRepetido(numeros)) {
+                    int[] numeros = controlador.obtenerNumeros(datos);
+
+                    if (!controlador.esRepetido(numeros)) {
                         apuestas.get(i).setOrdenCaballos(numeros);
                     } else {
-                        //añadir a error
+                        errores.add(apuestas.get(i));
+                        apuestas.eliminar(i);
+                        i--;
                     }
 
-                    //VERIFICAR LO DE LOS NÚMEROS REPETIDOS
                 } catch (NumberFormatException e) {
-                    //METER A ERROR
+                    errores.add(apuestas.get(i));
+                    apuestas.eliminar(i);
+                    i--;
                 }
             } else {
-                //METER LA APUESTA A UN ERROR
+                errores.add(apuestas.get(i));
+                apuestas.eliminar(i);
+                i--;
             }
         }
+        ventanaPrincipal.getAreaTexto().setText(ventanaPrincipal.getAreaTexto().getText()
+                + "\n" + "Apuestas ingresadas Exitosamente"
+                + "\nApuestas Validas: " + apuestas.getSize()
+                + "\nApuestas Invalidas: " + errores.getSize());
     }
 
-    public VentajaPrincipal getVentajaPrincipal() {
-        return ventajaPrincipal;
+    public void calcularResultados(Lista<String> resultadoCarrera) {
+        for (int i = 0; i < apuestas.getSize(); i++) {
+            resultados.add(controlador.verificarResultados(apuestas.get(i), resultadoCarrera, 0, 0));
+        }
+        ventanaPrincipal.getAreaTexto().setText(ventanaPrincipal.getAreaTexto().getText()
+                + "\nResultados calculados exitosamente");
     }
 
-    public void setVentajaPrincipal(VentajaPrincipal ventajaPrincipal) {
-        this.ventajaPrincipal = ventajaPrincipal;
+    public void ordenarResultados(boolean esPunteos) {
+        if (esPunteos) {
+            controlador.obtenerResultadosPorPuntaje(resultados);
+        } else {
+            controlador.obtenerResultadosPorNombres(resultados);
+        }
+        controlador.llenarTabla(resultados);
+    }
+
+    public void llenarCaballos(JComboBox<String> caballosDisponibles) {
+        caballosDisponibles.removeAllItems();
+        DefaultComboBoxModel modeloCombo = new DefaultComboBoxModel();
+        for (int i = 1; i <= Constantes.CANTIDAD_CABALLOS; i++) {
+            modeloCombo.addElement(i);
+        }
+        caballosDisponibles.setModel(modeloCombo);
+
+    }
+
+    public VentanaPrincipal getVentanaPrincipal() {
+        return ventanaPrincipal;
+    }
+
+    public void setVentanaPrincipal(VentanaPrincipal ventajaPrincipal) {
+        this.ventanaPrincipal = ventajaPrincipal;
     }
 
     public LectorArchivosEnTexto getLector() {
@@ -74,6 +117,22 @@ public class Principal {
 
     public void setLector(LectorArchivosEnTexto lector) {
         this.lector = lector;
+    }
+
+    public TablaResultados getTablaResultados() {
+        return tablaResultados;
+    }
+
+    public void setTablaResultados(TablaResultados tablaResultados) {
+        this.tablaResultados = tablaResultados;
+    }
+
+    public EditorResultados getEditorResultados() {
+        return editorResultados;
+    }
+
+    public void setEditorResultados(EditorResultados editorResultados) {
+        this.editorResultados = editorResultados;
     }
 
 }

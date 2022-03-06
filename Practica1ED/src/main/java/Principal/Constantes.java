@@ -11,6 +11,8 @@ package Principal;
 public class Constantes {
     
     public static final int CANTIDAD_CABALLOS = 10;
+    public static final int CANTIDAD_PUNTOS_MAXIMA = 10;
     public static final int CANTIDAD_DATOS = 12;
+    public static final int [] CABALLOS = {1,2,3,4,5,6,7,8,9,10};
     
 }
