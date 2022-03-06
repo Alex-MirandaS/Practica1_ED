@@ -26,7 +26,7 @@ public class Controlador {
         this.principal = principal;
     }
 
-    public Lista<Ficha> obtenerDatosTexto() {
+    public Lista<Ficha> obtenerDatosTexto(Lista<String> pasosIngresoApuestas) {
         Lista<Ficha> filasArchivo = new Lista<>();
         JFileChooser fileChosser = new JFileChooser();
         int seleccion = fileChosser.showOpenDialog(principal.getVentanaPrincipal());
@@ -35,7 +35,7 @@ public class Controlador {
             //aqui selecciono y guardo el FILE que va a utilizar el FileReader
             File fichero = fileChosser.getSelectedFile();
             try {
-                filasArchivo = principal.getLector().leerFichero(fichero);
+                filasArchivo = principal.getLector().leerFichero(fichero, pasosIngresoApuestas);
                 //principal.getPrincipalGUI().getAreaTexto().setText("");
                 //mostrarTextArea(principal.getPrincipalGUI().getAreaTexto());
                 //pathDocumentoActual = fichero.getAbsolutePath();
@@ -153,20 +153,77 @@ public class Controlador {
         }
     }
 
-    public void llenarTabla(Lista<Resultado> lista) {
+    public void llenarTabla(Lista<Object> lista, boolean esErrores) {
 
         DefaultTableModel modelo = new DefaultTableModel();
-
         principal.getTablaResultados().getTabla().setModel(modelo);
 
-        modelo.addColumn("Nombre del Apostador");
-        modelo.addColumn("Puntos");
+        if (esErrores) {
 
-        for (int i = 0; i < lista.getSize(); i++) {
-            modelo.addRow(new Object[]{lista.get(i).getFicha().getApostador(), lista.get(i).getPuntajeTotal()});
+            modelo.addColumn("Error");
+            Ficha temp;
+            for (int i = 0; i < lista.getSize(); i++) {
+                temp = (Ficha) lista.get(i);
+                modelo.addRow(new Object[]{temp.getDatos()});
+            }
+        } else {
+            modelo.addColumn("Nombre del Apostador");
+            modelo.addColumn("Puntos");
+            Resultado temp;
+            for (int i = 0; i < lista.getSize(); i++) {
+                temp = (Resultado) lista.get(i);
+                modelo.addRow(new Object[]{temp.getFicha().getApostador(), temp.getPuntajeTotal()});
+            }
         }
 
-        principal.getTablaResultados().setVisible(true);
+    }
+
+    public int obtenerNumeroMayor(Lista<String> lista) {
+
+        // Asumir que el mayor es el primero
+        int mayor = Integer.parseInt(lista.get(0));
+        // Recorrer arreglo y ver si no es así
+        // (comenzar desde el 1 porque el 0 ya lo tenemos contemplado arriba)
+        for (int x = 1; x < lista.getSize(); x++) {
+            if (Integer.parseInt(lista.get(x)) > mayor) {
+                mayor = Integer.parseInt(lista.get(x));
+            }
+        }
+        return mayor;
+    }
+
+    public int obtenerNumeroMenor(Lista<String> lista) {
+
+        // Asumir que el mayor es el primero
+        int menor = Integer.parseInt(lista.get(0));
+        // Recorrer arreglo y ver si no es así
+        // (comenzar desde el 1 porque el 0 ya lo tenemos contemplado arriba)
+        for (int x = 1; x < lista.getSize(); x++) {
+            if (Integer.parseInt(lista.get(x)) < menor) {
+                menor = Integer.parseInt(lista.get(x));
+            }
+        }
+        return menor;
+    }
+
+    public int obtenerPromedio(Lista<String> lista) {
+
+        // Asumir que el mayor es el primero
+        int mayor = 0;
+        // Recorrer arreglo y ver si no es así
+        // (comenzar desde el 1 porque el 0 ya lo tenemos contemplado arriba)
+        for (int x = 1; x < lista.getSize(); x++) {
+
+            mayor += Integer.parseInt(lista.get(x));
+
+        }
+        return (mayor/(lista.getSize()-1));
+    }
+
+    public void pasos(Lista<String> pasos) {
+        principal.getVentanaPrincipal().getAreaTexto().setText(principal.getVentanaPrincipal().getAreaTexto().getText() + "\nMayor cantidad de Pasos: " + obtenerNumeroMayor(pasos));
+        principal.getVentanaPrincipal().getAreaTexto().setText(principal.getVentanaPrincipal().getAreaTexto().getText() + "\nMenor cantidad de Pasos: " + obtenerNumeroMenor(pasos));
+        principal.getVentanaPrincipal().getAreaTexto().setText(principal.getVentanaPrincipal().getAreaTexto().getText() + "\nPasos Promedio: " + obtenerPromedio(pasos));
     }
 
 }

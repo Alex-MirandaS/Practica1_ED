@@ -79,6 +79,11 @@ public class EditorResultados extends javax.swing.JFrame {
         salir.setFont(new java.awt.Font("Noto Sans CJK KR", 2, 12)); // NOI18N
         salir.setForeground(new java.awt.Color(255, 255, 255));
         salir.setText("Salir");
+        salir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                salirActionPerformed(evt);
+            }
+        });
         jPanel1.add(salir);
 
         aceptar.setBackground(new java.awt.Color(0, 0, 0));
@@ -94,14 +99,14 @@ public class EditorResultados extends javax.swing.JFrame {
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.PAGE_END);
 
-        jPanel6.setLayout(new java.awt.GridLayout());
+        jPanel6.setLayout(new java.awt.GridLayout(1, 0));
         getContentPane().add(jPanel6, java.awt.BorderLayout.LINE_START);
 
         jPanel7.setBackground(new java.awt.Color(0, 0, 0));
-        jPanel7.setLayout(new java.awt.GridLayout());
+        jPanel7.setLayout(new java.awt.GridLayout(1, 0));
         getContentPane().add(jPanel7, java.awt.BorderLayout.PAGE_START);
 
-        jPanel8.setLayout(new java.awt.GridLayout());
+        jPanel8.setLayout(new java.awt.GridLayout(1, 0));
         getContentPane().add(jPanel8, java.awt.BorderLayout.LINE_END);
 
         jPanel2.setLayout(new java.awt.GridLayout(1, 2));
@@ -194,6 +199,10 @@ public class EditorResultados extends javax.swing.JFrame {
             aceptar.setEnabled(true);
         }
     }//GEN-LAST:event_agregarCaballoActionPerformed
+
+    private void salirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_salirActionPerformed
+        this.setVisible(false);
+    }//GEN-LAST:event_salirActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

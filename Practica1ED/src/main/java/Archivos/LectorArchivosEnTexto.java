@@ -22,7 +22,7 @@ public class LectorArchivosEnTexto {
     //File=archivo
     //FileReader necesita a un archivo para poder leerlo
     //BufferedReader lee el texto del archivo
-    public Lista<Ficha> leerFichero(File archivo) throws FileNotFoundException, IOException {
+    public Lista<Ficha> leerFichero(File archivo, Lista<String> pasos) throws FileNotFoundException, IOException {
         Lista<Ficha> textos = new Lista<>();
         FileReader fr = new FileReader(archivo);
         BufferedReader br = new BufferedReader(fr);
@@ -30,7 +30,8 @@ public class LectorArchivosEnTexto {
         //int fila = 1;
         while ((linea = br.readLine()) != null) {
             //con la linea leida, separamos los campos
-           textos.add(new Ficha(linea));
+            textos.add(new Ficha(linea));
+            pasos.add("" + 1);
         }
         fr.close();
         return textos;

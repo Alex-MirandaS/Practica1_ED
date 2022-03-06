@@ -160,11 +160,12 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 
     private void entregaResultadosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_entregaResultadosActionPerformed
         principal.ordenarResultados(true);
+        principal.getTablaResultados().setVisible(true);
     }//GEN-LAST:event_entregaResultadosActionPerformed
 
     private void verificarApuestasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_verificarApuestasActionPerformed
         principal.verificarApuestas();
-        
+
     }//GEN-LAST:event_verificarApuestasActionPerformed
 
     private void ingresarResultadosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ingresarResultadosActionPerformed
