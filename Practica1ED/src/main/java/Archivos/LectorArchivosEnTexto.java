@@ -31,6 +31,7 @@ public class LectorArchivosEnTexto {
         while ((linea = br.readLine()) != null) {
             //con la linea leida, separamos los campos
             textos.add(new Ficha(linea));
+            //Aqui añadimos un paso a los pasos de la insercion de apuestas
             pasos.add("" + 1);
         }
         fr.close();

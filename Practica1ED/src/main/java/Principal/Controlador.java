@@ -35,10 +35,8 @@ public class Controlador {
             //aqui selecciono y guardo el FILE que va a utilizar el FileReader
             File fichero = fileChosser.getSelectedFile();
             try {
+                //Se le asigna el valor obtenido del texto, para manipular las apuestas
                 filasArchivo = principal.getLector().leerFichero(fichero, pasosIngresoApuestas);
-                //principal.getPrincipalGUI().getAreaTexto().setText("");
-                //mostrarTextArea(principal.getPrincipalGUI().getAreaTexto());
-                //pathDocumentoActual = fichero.getAbsolutePath();
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(null, "Error al leer el archivo");
             }
@@ -47,20 +45,14 @@ public class Controlador {
         return filasArchivo;
     }
 
+    //Se encarga de separar una cadena a un array
     public String[] separarCampos(String linea) {
         String[] campos = linea.split(",");
         return campos;
     }
+//Se encarga de evaluar si se encuentra un caballo repetido en el arreglo
 
-    public int[] obtenerOrdenCaballos(String[] valores) {
-        int[] orden = new int[valores.length - 2];
-        for (int i = 2; i < valores.length; i++) {
-            orden[i - 2] = Integer.parseInt(valores[i]);
-        }
-        return orden;
-    }
-
-    public boolean esRepetido(int[] numeros) {
+    public boolean esRepetido(int[] numeros, int pasos) {
         Lista<String> caballos = new Lista<>();
         caballos.add("" + 1);
         caballos.add("" + 2);
@@ -72,31 +64,41 @@ public class Controlador {
         caballos.add("" + 8);
         caballos.add("" + 9);
         caballos.add("" + 10);
-
-        return verificarRepetido(numeros, caballos, 0, 0);
+//Realiza 10 asignaciones
+        pasos += 10;
+        return verificarRepetido(numeros, caballos, 0, 0, pasos);
     }
+//Es un método recursivo encargado de eliminar un elemento de una lista de 10 caballos, al encontrar un caballo, lo elimina de la lista
 
-    private boolean verificarRepetido(int[] numeros, Lista<String> caballos, int indiceLista, int indiceArray) {
+    private boolean verificarRepetido(int[] numeros, Lista<String> caballos, int indiceLista, int indiceArray, int pasos) {
 
         if (caballos.getSize() == indiceLista) {
+            //acaba la recursividad, hallando un error
+            pasos++;
             return true;
         } else if (numeros[indiceArray] == Integer.parseInt(caballos.get(indiceLista))) {
             caballos.eliminar(indiceLista);
-
+            //elimina un valor
+            pasos++;
             if (caballos.esVacia()) {
+                //acaba la recursividad, de forma correcta
+                pasos++;
                 return false;
             } else {
-                return verificarRepetido(numeros, caballos, 0, indiceArray + 1);
+                //realiza recursividad
+                pasos++;
+                return verificarRepetido(numeros, caballos, 0, indiceArray + 1, pasos);
             }
         } else {
-            if (caballos.getSize() == (indiceLista - 1)) {
-                return true;
-            }
-            return verificarRepetido(numeros, caballos, indiceLista + 1, indiceArray);
+            //realiza recursividad
+            pasos++;
+            return verificarRepetido(numeros, caballos, indiceLista + 1, indiceArray, pasos);
         }
     }
+//Se encarga de transformar un valor de String a Int ya que equivale al número de caballos
 
-    public int[] obtenerNumeros(String[] datos) {
+    public int[] obtenerNumeros(String[] datos, int pasos) {
+        //asigna 10 valores
         int[] array = {Integer.parseInt(datos[2]),
             Integer.parseInt(datos[3]),
             Integer.parseInt(datos[4]),
@@ -107,51 +109,62 @@ public class Controlador {
             Integer.parseInt(datos[9]),
             Integer.parseInt(datos[10]),
             Integer.parseInt(datos[11])};
+        pasos += 10;
         return array;
     }
+//Es un metodo recursivo que se encarga de verificar y asignar el punteo requerido a cada participante que ha ingresado una apuesta valida
 
-    public Resultado verificarResultados(Ficha get, Lista<String> resultadoCarrera, int indice, int puntos) {
+    public Resultado verificarResultados(Ficha get, Lista<String> resultadoCarrera, int indice, int puntos, int pasos) {
 
         if ((resultadoCarrera.getSize() - 1) == indice) {
-            return new Resultado(puntos, get);
+            pasos++;
+            return new Resultado(puntos, get);//Finaliza la recursividad, cuando ya ha asignado todos los valores
         } else if (get.getOrdenCaballos()[indice] == Integer.parseInt(resultadoCarrera.get(indice))) {
-            puntos = puntos + (Constantes.CANTIDAD_PUNTOS_MAXIMA - indice);
+            puntos = puntos + (Constantes.CANTIDAD_PUNTOS_MAXIMA - indice);//Si encuentra una similitud en cuanto al orden ingresado y al de la carrera, asigna una puntuación
+            pasos++;
         }
-        return verificarResultados(get, resultadoCarrera, indice + 1, puntos);
+        pasos++;
+        return verificarResultados(get, resultadoCarrera, indice + 1, puntos, pasos);//realiza la recursividad
 
     }
+//Se encarga de ordenar los resultados por nombres 
 
-    public void obtenerResultadosPorNombres(Lista<Resultado> listado) {
+    public void obtenerResultadosPorNombres(Lista<Resultado> listado, int pasos) {
         Resultado temp;
-        for (int i = 0; i < listado.getSize(); i++) {
-            for (int j = i + 1; j < listado.getSize(); j++) {
-
-                // to compare one string with other strings
-                if (listado.get(i).getFicha().getApostador().compareTo(listado.get(j).getFicha().getApostador()) > 0) {
-                    // swapping
+        for (int i = 0; i < listado.getSize(); i++) {//Entra a un ciclo y asignación
+            pasos++;
+            for (int j = i + 1; j < listado.getSize(); j++) {//Entra a un ciclo y asignación
+                pasos++;
+                if (listado.get(i).getFicha().getApostador().compareTo(listado.get(j).getFicha().getApostador()) > 0) {//Realiza una comparación y asignaciones
                     temp = listado.get(i);
                     listado.modifica(listado.get(j), i);
                     listado.modifica(temp, j);
+                    pasos+=3;
 
                 }
             }
         }
 
     }
+//Se encarga de ordenar los resultados por puntaje 
 
-    public void obtenerResultadosPorPuntaje(Lista<Resultado> listado) {
+    public void obtenerResultadosPorPuntaje(Lista<Resultado> listado, int pasos) {
         int i, j;
         Resultado aux;
-        for (i = 0; i < listado.getSize() - 1; i++) {
-            for (j = 0; j < listado.getSize() - i - 1; j++) {
-                if (listado.get(j + 1).getPuntajeTotal() > listado.get(j).getPuntajeTotal()) {
+        for (i = 0; i < listado.getSize() - 1; i++) {//Entra a un ciclo y asignación
+            pasos++;
+            for (j = 0; j < listado.getSize() - i - 1; j++) {//Entra a un ciclo y asignación
+                pasos++;
+                if (listado.get(j + 1).getPuntajeTotal() > listado.get(j).getPuntajeTotal()) {//Realiza una comparación y asignaciones
                     aux = listado.get(j + 1);
                     listado.modifica(listado.get(j), j + 1);
                     listado.modifica(aux, j);
+                    pasos+=3;
                 }
             }
         }
     }
+//Se encarga de llenar una tabla de resultados o de errores segun sea el caso
 
     public void llenarTabla(Lista<Object> lista, boolean esErrores) {
 
@@ -177,13 +190,11 @@ public class Controlador {
         }
 
     }
+//Obtiene el número mayor de una lista
 
-    public int obtenerNumeroMayor(Lista<String> lista) {
+    private int obtenerNumeroMayor(Lista<String> lista) {
 
-        // Asumir que el mayor es el primero
         int mayor = Integer.parseInt(lista.get(0));
-        // Recorrer arreglo y ver si no es así
-        // (comenzar desde el 1 porque el 0 ya lo tenemos contemplado arriba)
         for (int x = 1; x < lista.getSize(); x++) {
             if (Integer.parseInt(lista.get(x)) > mayor) {
                 mayor = Integer.parseInt(lista.get(x));
@@ -191,13 +202,11 @@ public class Controlador {
         }
         return mayor;
     }
+//Obtiene el número Menor de una lista
 
-    public int obtenerNumeroMenor(Lista<String> lista) {
+    private int obtenerNumeroMenor(Lista<String> lista) {
 
-        // Asumir que el mayor es el primero
         int menor = Integer.parseInt(lista.get(0));
-        // Recorrer arreglo y ver si no es así
-        // (comenzar desde el 1 porque el 0 ya lo tenemos contemplado arriba)
         for (int x = 1; x < lista.getSize(); x++) {
             if (Integer.parseInt(lista.get(x)) < menor) {
                 menor = Integer.parseInt(lista.get(x));
@@ -205,22 +214,19 @@ public class Controlador {
         }
         return menor;
     }
+//Obtiene el promedio de los pasos de una lista
 
-    public int obtenerPromedio(Lista<String> lista) {
+    private int obtenerPromedio(Lista<String> lista) {
 
-        // Asumir que el mayor es el primero
-        int mayor = 0;
-        // Recorrer arreglo y ver si no es así
-        // (comenzar desde el 1 porque el 0 ya lo tenemos contemplado arriba)
-        for (int x = 1; x < lista.getSize(); x++) {
-
-            mayor += Integer.parseInt(lista.get(x));
-
+        int promedio = 0;
+        for (int x = 0; x < lista.getSize(); x++) {
+            promedio += Integer.parseInt(lista.get(x));
         }
-        return (mayor/(lista.getSize()-1));
+        return (promedio / lista.getSize());
     }
+//Obtiene los datos correspndientes a los pasos
 
-    public void pasos(Lista<String> pasos) {
+    public void imprimirPasos(Lista<String> pasos) {
         principal.getVentanaPrincipal().getAreaTexto().setText(principal.getVentanaPrincipal().getAreaTexto().getText() + "\nMayor cantidad de Pasos: " + obtenerNumeroMayor(pasos));
         principal.getVentanaPrincipal().getAreaTexto().setText(principal.getVentanaPrincipal().getAreaTexto().getText() + "\nMenor cantidad de Pasos: " + obtenerNumeroMenor(pasos));
         principal.getVentanaPrincipal().getAreaTexto().setText(principal.getVentanaPrincipal().getAreaTexto().getText() + "\nPasos Promedio: " + obtenerPromedio(pasos));
